@@ -7,10 +7,8 @@ use App\Form\ContactType;
 
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
-
 use Symfony\Component\HttpFoundation\Response;
-
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
 /***
@@ -18,25 +16,26 @@ use FOS\RestBundle\Controller\Annotations as Rest;
  * 
  * @Route("/api",name="api_")
  * 
- * */
+ * 
+ */
 class ContactController  extends AbstractFOSRestController
 {
     /**
-     * Lists all Movies.
-     * @Rest\Get("/movies")
+     * Lists all Contacts.
+     * @Rest\Get("/contacts")
      *
      * @return Response
      */
     public function getContact()
     {
         $repository = $this->getDoctrine()->getRepository(Contact::class);
-        $movies = $repository->findall();
-        return $this->handleView($this->view($movies));
+        $contacts = $repository->findAll();
+        return $this->handleView($this->view($contacts));
     }
 
     /**
-     * Create Movie.
-     * @Rest\Post("/movie")
+     * Create Contact.
+     * @Rest\Post("/new_contact")
      *
      * @return Response
      */
@@ -55,23 +54,24 @@ class ContactController  extends AbstractFOSRestController
         return $this->handleView($this->view($form->getErrors()));
     }
     /**
-     * Create Movie.
-     * @Rest\Post("/movie")
+     * Delete Contact.
+     * @Rest\Delete("/delete_contact/{id}")
      *
      * @return Response
      */
     public function deleteContact(Request $request)
     {
         $contact = new Contact();
-        $form = $this->createForm(ContactType::class, $contact);
-        $data = json_decode($request->getContent(), true);
-        $form->submit($data);
-        if ($form->isSubmitted() && $form->isValid()) {
+  
+        $repository = $this->getDoctrine()->getRepository(Contact::class);
+        $contact = $repository->find($request->get('id'));
+           if($contact){
+        
             $em = $this->getDoctrine()->getManager();
-            $em->persist($contact);
+            $em->remove($contact);
             $em->flush();
             return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
         }
-        return $this->handleView($this->view($form->getErrors()));
+        return $this->handleView($this->view(['status' => 'error'], Response::HTTP_NOT_FOUND));
     }
 }
