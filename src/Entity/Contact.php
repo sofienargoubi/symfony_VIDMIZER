@@ -5,11 +5,15 @@ namespace App\Entity;
 use App\Repository\ContactRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="contact")
+ * @UniqueEntity(fields="nom", message="nom is already taken.")
+ * @UniqueEntity(fields="prenom", message="Prénom is already taken.")
+ * @UniqueEntity(fields="telephone", message="Télephone is already taken.")
  */
 class Contact
 {
@@ -29,11 +33,13 @@ class Contact
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      * 
+     * 
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="bigint", unique=true)
+     * 
      * 
      */
     private $telephone;

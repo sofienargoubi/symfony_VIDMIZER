@@ -49,9 +49,12 @@ class ContactController  extends AbstractFOSRestController
             $em = $this->getDoctrine()->getManager();
             $em->persist($contact);
             $em->flush();
-            return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
+            return $this->handleView($this->view(['status' => 'Contact added successfully'], Response::HTTP_CREATED));
         }
-        return $this->handleView($this->view($form->getErrors()));
+        $globalErrors = $form->getErrors();
+        $nameErrors = $form['nom']->getErrors();
+        $priceErrors = $form['prenom']->getErrors();
+        return $this->handleView($this->view($globalErrors,Response::HTTP_IM_USED));
     }
     /**
      * Delete Contact.
