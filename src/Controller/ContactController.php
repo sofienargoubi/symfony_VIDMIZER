@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Contact;
 use App\Form\ContactType;
-
+use App\Repository\ContactRepository;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,10 +26,9 @@ class ContactController  extends AbstractFOSRestController
      *
      * @return Response
      */
-    public function getContact()
+    public function getContact(ContactRepository $productRepository)
     {
-        $repository = $this->getDoctrine()->getRepository(Contact::class);
-        $contacts = $repository->findAll();
+        $contacts = $productRepository->findAllOrdred();
         return $this->handleView($this->view($contacts));
     }
 
@@ -51,10 +50,11 @@ class ContactController  extends AbstractFOSRestController
             $em->flush();
             return $this->handleView($this->view(['status' => 'Contact added successfully'], Response::HTTP_CREATED));
         }
+       
         $globalErrors = $form->getErrors();
         $nameErrors = $form['nom']->getErrors();
         $priceErrors = $form['prenom']->getErrors();
-        return $this->handleView($this->view($globalErrors,Response::HTTP_IM_USED));
+        return $this->handleView($this->view(['status' => 'bad','errors' => $globalErrors],Response::HTTP_IM_USED));
     }
     /**
      * Delete Contact.
