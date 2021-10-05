@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Contact;
 use App\Entity\User;
 use App\Form\UserType;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -20,18 +19,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
  */
 class UserController  extends AbstractFOSRestController
 {
-    /**
-     * Lists all Contacts.
-     * @Rest\Get("/contacts")
-     *
-     * @return Response
-     */
-    public function getContact()
-    {
-        $repository = $this->getDoctrine()->getRepository(Contact::class);
-        $contacts = $repository->findAll();
-        return $this->handleView($this->view($contacts));
-    }
+    
 
     /**
      * Create user.
@@ -48,6 +36,7 @@ class UserController  extends AbstractFOSRestController
         $form = $this->createForm(UserType::class, $contact);
         $data = json_decode($request->getContent(), true);
         $form->submit($data);
+        
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
 
@@ -57,7 +46,9 @@ class UserController  extends AbstractFOSRestController
             $em->flush();
             return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
         }
-        return $this->handleView($this->view($form->getErrors()));
+        $globalErrors = $form->getErrors();
+
+        return $this->handleView($this->view(['status' => 'bad', 'errors' => $globalErrors], Response::HTTP_IM_USED));
     }
      /**
      * login user.
@@ -65,56 +56,28 @@ class UserController  extends AbstractFOSRestController
      *
      * @return Response
      */
-   // public function login(Request $request): Response
-  //  {
-       /* $options = [
-            'cost' => 12,
-        ];
+    public function login(Request $request): Response
+    {
+       
         $contact = new User();
         $form = $this->createForm(UserType::class, $contact);
         $data = json_decode($request->getContent(), true);
         $form->submit($data);
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $repository = $this->getDoctrine()->getRepository(Contact::class);
-            $user = $repository->findOneBy(["email" => $data->get('email')]);
+            $repository = $this->getDoctrine()->getRepository(User::class);
+         
+            $user = $repository->findOneBy(["email" => $data["email"]]);
+
+            if($user && password_verify($data["pwd"], $user->getPwd())){
+                return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_ACCEPTED));
+            }else {
+                return $this->handleView($this->view(['status' => 'Invalid Credentials'], Response::HTTP_UNAUTHORIZED));
+            }
             
-            $em = $this->getDoctrine()->getManager();
-
-
-            $contact->setPwd(password_hash($contact->getPwd(), PASSWORD_BCRYPT, $options));
-
-            $em->persist($contact);
-            $em->flush();
-            return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
         }
-        return $this->handleView($this->view($form->getErrors()));*/
-        //$user = $this->getUser();
-       
-
-      /*  return $this->json([
-            'user' => $this->getUser() ? $this->getUser()->getId() : null]
-        );
-    }*/
-    /**
-     * Delete Contact.
-     * @Rest\Delete("/delete_contact/{id}")
-     *
-     * @return Response
-     */
-    public function deleteContact(Request $request)
-    {
-        $contact = new Contact();
-  
-        $repository = $this->getDoctrine()->getRepository(Contact::class);
-        $contact = $repository->find($request->get('id'));
-           if($contact){
-        
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($contact);
-            $em->flush();
-            return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
-        }
-        return $this->handleView($this->view(['status' => 'error'], Response::HTTP_NOT_FOUND));
+        return $this->handleView($this->view($form->getErrors()));
+      
     }
+    
 }

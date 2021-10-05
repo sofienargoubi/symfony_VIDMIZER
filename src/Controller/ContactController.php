@@ -45,16 +45,17 @@ class ContactController  extends AbstractFOSRestController
         $data = json_decode($request->getContent(), true);
         $form->submit($data);
         if ($form->isSubmitted() && $form->isValid()) {
+
             $em = $this->getDoctrine()->getManager();
             $em->persist($contact);
             $em->flush();
+
             return $this->handleView($this->view(['status' => 'Contact added successfully'], Response::HTTP_CREATED));
         }
-       
+
         $globalErrors = $form->getErrors();
-        $nameErrors = $form['nom']->getErrors();
-        $priceErrors = $form['prenom']->getErrors();
-        return $this->handleView($this->view(['status' => 'bad','errors' => $globalErrors],Response::HTTP_IM_USED));
+
+        return $this->handleView($this->view(['status' => 'bad', 'errors' => $globalErrors], Response::HTTP_IM_USED));
     }
     /**
      * Delete Contact.
@@ -65,11 +66,11 @@ class ContactController  extends AbstractFOSRestController
     public function deleteContact(Request $request)
     {
         $contact = new Contact();
-  
+
         $repository = $this->getDoctrine()->getRepository(Contact::class);
         $contact = $repository->find($request->get('id'));
-           if($contact){
-        
+        if ($contact) {
+
             $em = $this->getDoctrine()->getManager();
             $em->remove($contact);
             $em->flush();
