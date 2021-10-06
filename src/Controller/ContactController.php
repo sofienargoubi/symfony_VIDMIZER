@@ -38,7 +38,7 @@ class ContactController  extends AbstractFOSRestController
      *
      * @return Response
      */
-    public function postContact(Request $request)
+    public function addContact(Request $request)
     {
         $contact = new Contact();
         $form = $this->createForm(ContactType::class, $contact);
@@ -66,14 +66,14 @@ class ContactController  extends AbstractFOSRestController
     public function deleteContact(Request $request)
     {
         $contact = new Contact();
-
         $repository = $this->getDoctrine()->getRepository(Contact::class);
         $contact = $repository->find($request->get('id'));
-        if ($contact) {
 
+        if ($contact) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($contact);
             $em->flush();
+
             return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
         }
         return $this->handleView($this->view(['status' => 'error'], Response::HTTP_NOT_FOUND));

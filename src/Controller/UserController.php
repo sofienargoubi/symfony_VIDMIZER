@@ -19,7 +19,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
  */
 class UserController  extends AbstractFOSRestController
 {
-    
+
 
     /**
      * Create user.
@@ -29,28 +29,26 @@ class UserController  extends AbstractFOSRestController
      */
     public function register(Request $request)
     {
-        $options = [
-            'cost' => 12,
-        ];
-        $contact = new User();
-        $form = $this->createForm(UserType::class, $contact);
+      
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
         $data = json_decode($request->getContent(), true);
         $form->submit($data);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
+
             $em = $this->getDoctrine()->getManager();
-
-            $contact->setPwd(password_hash($contact->getPwd(), PASSWORD_BCRYPT, $options));
-
-            $em->persist($contact);
+            $options = ['cost' => 12];
+            $user->setPwd(password_hash($user->getPwd(), PASSWORD_BCRYPT, $options));
+            $em->persist($user);
             $em->flush();
+
             return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_CREATED));
         }
-        $globalErrors = $form->getErrors();
 
-        return $this->handleView($this->view(['status' => 'bad', 'errors' => $globalErrors], Response::HTTP_IM_USED));
+        return $this->handleView($this->view(['status' => 'bad', 'errors' => $form->getErrors()], Response::HTTP_IM_USED));
     }
-     /**
+    /**
      * login user.
      * @Rest\Post("/login")
      *
@@ -58,26 +56,15 @@ class UserController  extends AbstractFOSRestController
      */
     public function login(Request $request): Response
     {
-       
-        $contact = new User();
-        $form = $this->createForm(UserType::class, $contact);
         $data = json_decode($request->getContent(), true);
-        $form->submit($data);
-        if ($form->isSubmitted() && $form->isValid()) {
+        $repository = $this->getDoctrine()->getRepository(User::class);
+        $user = $repository->findOneBy(["email" => $data["email"]]);
 
-            $repository = $this->getDoctrine()->getRepository(User::class);
-         
-            $user = $repository->findOneBy(["email" => $data["email"]]);
-
-            if($user && password_verify($data["pwd"], $user->getPwd())){
-                return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_ACCEPTED));
-            }else {
-                return $this->handleView($this->view(['status' => 'Invalid Credentials'], Response::HTTP_UNAUTHORIZED));
-            }
-            
+        if ($user && password_verify($data["pwd"], $user->getPwd())) {
+            return $this->handleView($this->view(['status' => 'ok'], Response::HTTP_ACCEPTED));
         }
-        return $this->handleView($this->view($form->getErrors()));
-      
+
+        return $this->handleView($this->view(['status' => 'Invalid Credentials'], Response::HTTP_NON_AUTHORITATIVE_INFORMATION));
+
     }
-    
 }
