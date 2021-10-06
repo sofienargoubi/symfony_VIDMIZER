@@ -8,16 +8,9 @@ use App\Repository\ContactRepository;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
-/***
- * Contact controller.
- * 
- * @Route("/api",name="api_")
- * 
- * 
- */
+
 class ContactController  extends AbstractFOSRestController
 {
     /**

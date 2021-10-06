@@ -7,16 +7,9 @@ use App\Form\UserType;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
-/***
- * Contact controller.
- * 
- * @Route("/api",name="api_")
- * 
- * 
- */
+
 class UserController  extends AbstractFOSRestController
 {
 
@@ -29,7 +22,7 @@ class UserController  extends AbstractFOSRestController
      */
     public function register(Request $request)
     {
-      
+
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
         $data = json_decode($request->getContent(), true);
@@ -65,6 +58,5 @@ class UserController  extends AbstractFOSRestController
         }
 
         return $this->handleView($this->view(['status' => 'Invalid Credentials'], Response::HTTP_NON_AUTHORITATIVE_INFORMATION));
-
     }
 }

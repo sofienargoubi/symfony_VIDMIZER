@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Form;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -15,8 +17,7 @@ class UserType extends AbstractType
       ->add('prenom')
       ->add('email')
       ->add('pwd')
-      ->add('save', SubmitType::class)
-    ;
+      ->add('save', SubmitType::class);
   }
   public function configureOptions(OptionsResolver $resolver)
   {
