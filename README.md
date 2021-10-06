@@ -22,6 +22,7 @@ mini-application create with symfony4.4 and angular 9 , the projet contain authe
 
 - Clone the Master branch
 - Go to main directory by typing "cd symfony_VIDMIZER" and run "composer install"
+- Run you database server (wamp or xampp ) 
 - Run " php bin/console doctrine:database:create " 
 - Run " php bin/console doctrine:migrations:migrate "
 - Run " symfony server:start "
