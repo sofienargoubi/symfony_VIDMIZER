@@ -36,7 +36,7 @@ class Contact
     private $prenom;
 
     /**
-     * @ORM\Column(type="bigint", unique=true)
+     * @ORM\Column(type="string",length=255, unique=true)
      * 
      * 
      */
